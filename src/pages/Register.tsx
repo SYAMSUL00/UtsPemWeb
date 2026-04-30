@@ -6,8 +6,8 @@ import { TextArea } from "../components/ui/TextArea";
 
 const schema = z.object({
     nama: z.string().min(3, "Nama minimal 3 karakter"),
-    alamat: z.string().min(1, "Alamat tidak boleh kosong").min(5, "Alamat terlalu pendek"),
-    email: z.string().min(1, "Email tidak boleh kosong").email("Format email tidak valid"),
+    alamat: z.string().min(1, "Alamat wajib diisi"),
+    email: z.string().min(1, "Email wajib diisi").email("Format email tidak valid"),
     bio: z.string().optional(),
 });
 
