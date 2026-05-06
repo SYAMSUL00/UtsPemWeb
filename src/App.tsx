@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Beranda from "./pages/Beranda";
 import Competition from "./pages/Competition";
@@ -31,6 +32,15 @@ function App() {
                 {/*dashboard */}
             </Routes>
         </BrowserRouter>
+=======
+import Register from "./pages/Register";
+
+function App() {
+    return (
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center gap-40 p-8">
+            <Register />
+        </div>
+>>>>>>> 8a0fa43db7d0eaafe28b2230f01a4d3f0dfad5b7
     );
 }
 
