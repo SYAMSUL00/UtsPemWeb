@@ -1,38 +1,35 @@
-import React, {useState} from "react";
-import { ChevronDown } from "lucide-react";
+import React from "react";
 
-interface CollapseProps {
-    title : string;
-    description : string;
+interface ButtonProps {
+    label: string;
+    type?: "button" | "submit";
+    variant?: "primary" | "outline";
+    isLoading?: boolean;
+    onClick?: () => void;
 }
 
-export const Collapse: React.FC<CollapseProps> = ({ title, description
+export const Button: React.FC<ButtonProps> = ({
+    label,
+    type = "button",
+    variant = "primary",
+    isLoading = false,
+    onClick
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const base = "px-4 py-2 rounded font-medium";
 
-    return(
-        <div className="border border-gray-200 rounded-lg">
-            <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="cursor-pointer w-full px-4 py-3 flex items-center
-            gap-4 bg-white hover:bg-gray-50 transition-colors"
-            >
-                <div className="p-2 bg-amber-100">
-                    <ChevronDown 
-                    size={20}
-                    className={`text-gray-600 transition-transform ${
-                        isOpen ? "rotate-180" : ""
-                    }`}
-                    />
-                </div>
-                <span className="text-lg font-semibold text-gray-800 text-left flex-1">{title}</span>
-            </button>
+    const styles = {
+        primary: "bg-red-900 text-white hover:bg-red-800",
+        outline: "border border-red-900 text-red-900 hover:bg-red-50"
+    };
 
-            {isOpen && (
-                <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                    <p className="text-gray-700">{description}</p>
-                </div>
-            )}
-        </div>
+    return (
+        <button
+            type={type}
+            disabled={isLoading}
+            onClick={onClick}
+            className={`${base} ${styles[variant]}`}
+        >
+            {isLoading ? "Loading..." : label}
+        </button>
     );
 };
