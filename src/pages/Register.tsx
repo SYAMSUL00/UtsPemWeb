@@ -10,7 +10,7 @@ const schema = z.object({
     nama: z.string().min(3, "Nama minimal 3 karakter"),
     alamat: z.string().min(1, "Alamat wajib diisi"),
     email: z.string().min(1, "Email wajib diisi").email("Format email tidak valid"),
-    bio: z.string().optional(),
+    bio: z.string().min(5, "Minimal 1 kata"),
 });
 
 type RegisterForm = z.infer<typeof schema>;
@@ -54,6 +54,7 @@ export default function RegisterForm() {
                     name="bio"
                     register={register}
                     placeholder="Tentang dirimu..."
+                    error={errors.bio?.message}
                 />
                 <button
                     type="submit"

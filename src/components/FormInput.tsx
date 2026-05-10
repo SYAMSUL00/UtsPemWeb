@@ -1,22 +1,23 @@
-import {InputText} from "./ui/InputText";
-import LabelInput from "./ui/LabelInput";
+import { InputText } from "./ui/InputText";
 
 interface FormInputProps {
-    text: string;
+    text?: string;
+    label?: string;
     type: string;
     name: string;
-    register: any;  // ← hapus "?" agar wajib diisi
+    register: any;
     error?: string;
+    placeholder?: string;
 }
 
-const FormInput: React.FC<FormInputProps> = ({ text, type, name, register, error }) => { 
+const FormInput: React.FC<FormInputProps> = ({ text, label, type, name, register, error, placeholder }) => {
+    const displayLabel = label || text || "";
     return (
         <div className="flex flex-col gap-2 mb-3">
-            <LabelInput text={text} title={name} />
-            <InputText type={type} name={name} label={text} register={register} />
-            {error && <p className="text-red-500">{error}</p>}
+            <label className="font-medium">{displayLabel}</label>
+            <InputText type={type} name={name} register={register} placeholder={placeholder} error={error} />
         </div>
     )
-}    
+}
 
 export default FormInput;

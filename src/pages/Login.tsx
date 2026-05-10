@@ -1,17 +1,21 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { InputText } from "../components/ui/InputText";
+import { InputText } from "../components/ui/InputText"
 import { PasswordInput } from "../components/ui/PasswordInput";
 import { Link } from "react-router-dom";
 
 
+
 const schema = z.object({
-    email: z.string().email("Format email tidak valid"),
+    email: z.string().email("Email harus diisi"),
     password: z.string().min(6, "Password minimal 6 karakter"),
 });
 
-type LoginForm = z.infer<typeof schema>;
+type LoginForm = {
+    email: string;
+    password: string;
+};
 
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({

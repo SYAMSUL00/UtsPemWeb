@@ -4,6 +4,7 @@ interface ButtonProps {
     variant?: "primary" | "outline";
     isLoading?: boolean;
     onClick?: () => void;
+    className?: string; 
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -11,10 +12,10 @@ export const Button: React.FC<ButtonProps> = ({
     type = "button",
     variant = "primary",
     isLoading = false,
-    onClick
+    onClick,
+    className = "", 
 }) => {
     const base = "px-4 py-2 rounded font-medium";
-
     const styles = {
         primary: "bg-red-900 text-white",
         outline: "border border-red-900 text-red-900"
@@ -25,7 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
             type={type}
             disabled={isLoading}
             onClick={onClick}
-            className={`${base} ${styles[variant]}`}
+            className={`${base} ${styles[variant]} ${className}`}
         >
             {isLoading ? "Loading..." : label}
         </button>

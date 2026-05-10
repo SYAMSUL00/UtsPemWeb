@@ -8,6 +8,9 @@ import Seminar from "./pages/Seminar";
 import MainLayout from "./layouts/MainLayout";
 import AuthLayout from "./layouts/AuthLayout";
 import Workshop from "./pages/Workshop";
+import CreateCategory from "./pages/dashboard/categories/CreateCategory";
+import CreateSpeaker from "./pages/dashboard/speakers/CreateSpeaker";
+import CreateEvent from "./pages/dashboard/events/CreateEvent";
 
 function App() {
     return (
@@ -20,6 +23,10 @@ function App() {
                     <Route path="/seminar" element={<Seminar/>}/>
                     <Route path="/talkshow" element={<Talkshow/>}/>
                     <Route path="/workshop" element={<Workshop/>}/>
+                    <Route path="/category" element={<CreateCategory/>}/>
+                    <Route path="/event" element={<CreateEvent/>}/>
+                    <Route path="/speaker" element={<CreateSpeaker/>}/>
+
                 </Route>
 
                 {/*Auth */}

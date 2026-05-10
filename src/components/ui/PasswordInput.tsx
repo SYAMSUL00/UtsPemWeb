@@ -23,7 +23,7 @@ export const PasswordInput: React.FC<PasswordInputProps>=({
                 <input
                 type={show ?"text" : "password"}
                 {...register(name)}
-                className="border rounded px-3 py-2 w-full pr-10"
+                className={`p-2 border rounded w-full focus:outline-none ${error ? 'bg-red-200 border-red-600' : 'bg-white border-black'}`}
                 />
 
                 <button
