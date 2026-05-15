@@ -3,7 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { InputText } from "../components/ui/InputText"
 import { PasswordInput } from "../components/ui/PasswordInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 
 
@@ -22,8 +23,21 @@ export default function Login() {
         resolver: zodResolver(schema),
     });
 
+    const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
+
     const onSubmit = (data: LoginForm) => {
-        console.log(data);
+        if(data.email == "vaenamiftakhurrisko@gmail.com" && data.password == "24090100") {
+            //login sukses
+            alert("login sukses");
+            
+            login(data.email);
+
+            navigate("/dashboard");
+        } else {
+            //login gagal
+            alert("login gagal");
+        }
     };
 
     return (
