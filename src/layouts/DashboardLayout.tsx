@@ -25,7 +25,7 @@ export default function DashboardLayout() {
             <div className="h-screen sticky top-0 bg-red-900 w-64 flex flex-col justify-between p-4">
                 <div>
                     <div className="border-b border-red-700 py-6 mb-4">
-                        <h1 className="text-white text-2xl font-bold">infovest dashboard</h1>
+                        <h1 className="text-white text-2xl font-bold">Infovest Dashboard</h1>
                     </div>
 
                     <nav className="flex flex-col gap-1">
