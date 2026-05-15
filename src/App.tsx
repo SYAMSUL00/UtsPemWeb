@@ -16,6 +16,7 @@ import DashboardLayout from "./layouts/DashboardLayout";
 import CreateSpeaker from "./pages/dashboard/speakers/CreateSpeaker";
 import CreateEvent from "./pages/dashboard/events/CreateEvent";
 import SpeakerList from "./pages/dashboard/speakers/SpeakerList";
+import Workshop from "./pages/Workshop";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/competition" element={<Competition />} />
           <Route path="/seminar" element={<Seminar />} />
           <Route path="/talkshow" element={<Talkshow />} />
+          <Route path="/workshop" element={<Workshop />} />
         </Route>
 
         {/* auth */}
