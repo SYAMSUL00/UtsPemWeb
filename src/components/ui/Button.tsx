@@ -17,8 +17,8 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
     const base = "px-4 py-2 rounded font-medium";
     const styles = {
-        primary: "bg-red-900 text-white",
-        outline: "border border-red-900 text-red-900"
+        primary: "bg-blue-900 text-white",
+        outline: "border border-blue-900 text-blue-900"
     };
 
     return (

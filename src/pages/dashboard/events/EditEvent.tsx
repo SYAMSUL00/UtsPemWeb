@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,10 +21,11 @@ interface Category {
     name: string;
 }
 
-export default function CreateEvent() {
+export default function EditEvent() {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [categories, setCategories] = useState<Category[]>([]);
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+    const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
 
@@ -32,11 +33,21 @@ export default function CreateEvent() {
         fetch("http://localhost:3000/categories")
             .then(res => res.json())
             .then(data => setCategories(data));
-    }, []);
+
+        fetch(`http://localhost:3000/events/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setValue("name", data.name);
+                setValue("categoryId", String(data.categoryId));
+                setValue("location", data.location);
+                setValue("dateEvent", data.dateEvent.split("T")[0]);
+                setValue("description", data.description);
+            });
+    }, [id]);
 
     const onSubmit = async (data: FormData) => {
-        await fetch("http://localhost:3000/events", {
-            method: "POST",
+        await fetch(`http://localhost:3000/events/${id}`, {
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         });
@@ -47,8 +58,8 @@ export default function CreateEvent() {
         <div className="max-w-4xl mx-auto p-2 animate-fade-in">
             <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/40 p-8 w-full transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200/50">
                 <div className="mb-6 border-b border-gray-50 pb-4">
-                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create Event</h1>
-                    <p className="text-xs text-gray-400 mt-1">Tambahkan jadwal, lokasi, dan informasi lengkap event baru.</p>
+                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Edit Event</h1>
+                    <p className="text-xs text-gray-400 mt-1">Perbarui detail jadwal, lokasi, dan informasi event.</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -58,7 +69,6 @@ export default function CreateEvent() {
                         register={register} 
                         error={errors.name?.message} 
                         type="text" 
-                        placeholder="Nama event" 
                     />
 
                     <div className="flex flex-col gap-1.5">
@@ -81,7 +91,6 @@ export default function CreateEvent() {
                         register={register} 
                         error={errors.location?.message} 
                         type="text" 
-                        placeholder="Lokasi event" 
                     />
                     
                     <FormInput 
@@ -98,7 +107,6 @@ export default function CreateEvent() {
                         register={register} 
                         error={errors.description?.message} 
                         type="text" 
-                        placeholder="Deskripsi event" 
                     />
 
                     <div className="flex gap-3 pt-4 border-t border-gray-50 mt-2">
@@ -110,7 +118,7 @@ export default function CreateEvent() {
                             Batal
                         </button>
                         <Button 
-                            label="Tambah Event" 
+                            label="Simpan Perubahan" 
                             type="submit" 
                             isLoading={isSubmitting} 
                             className="flex-2 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md shadow-blue-600/10 hover:scale-[1.01] cursor-pointer" 

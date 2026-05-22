@@ -1,75 +1,82 @@
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import FormInput from "../../../components/FormInput";
 import { Button } from "../../../components/ui/Button";
 
-type FormData = {
-    nama: string;
-    role: string;
-    foto: FileList;
-};
-
 const schema = z.object({
-    nama: z.string().min(1, "Nama pembicara tidak boleh kosong"),
-    role: z.string().min(1, "Role/Jabatan tidak boleh kosong"),
-    foto: z
-        .instanceof(FileList)
-        .refine((files) => files?.length > 0, "Foto wajib diunggah"),
+    name: z.string().min(1, "Nama tidak boleh kosong"),
+    role: z.string().min(1, "Role tidak boleh kosong"),
+    image: z.string().min(1, "Image tidak boleh kosong"),
 });
 
+type FormData = z.infer<typeof schema>;
+
 export default function CreateSpeaker() {
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<FormData>({
+    const navigate = useNavigate();
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
 
-    const onSubmit = (data: FormData) => {
-        console.log(data);
+    const onSubmit = async (data: FormData) => {
+        await fetch("http://localhost:3000/speakers", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        });
+        navigate("/dashboard/speakers");
     };
 
     return (
-        <div className="py-6">
-            <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-md mx-auto">
+        <div className="flex justify-center items-center py-12 animate-fade-in">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/40 p-8 w-full max-w-md transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200/50">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">Create New Speaker</h1>
-                    <p className="text-sm text-gray-500 mt-1">Isi data pembicara dengan lengkap</p>
+                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create Speaker</h1>
+                    <p className="text-xs text-gray-400 mt-1">Tambahkan data pembicara atau pemateri baru ke sistem.</p>
                 </div>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-                    <FormInput
-                        text="Nama"
-                        name="nama"
-                        register={register}
-                        error={errors.nama?.message}
-                        type="text"
-                        placeholder="Masukkan nama pembicara"
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+                    <FormInput 
+                        label="Nama Pembicara" 
+                        name="name" 
+                        register={register} 
+                        error={errors.name?.message} 
+                        type="text" 
+                        placeholder="Nama speaker" 
                     />
-                    <FormInput
-                        text="Role"
-                        name="role"
-                        register={register}
-                        error={errors.role?.message}
-                        type="text"
-                        placeholder="Contoh: Senior Developer / CEO"
+                    
+                    <FormInput 
+                        label="Role / Jabatan" 
+                        name="role" 
+                        register={register} 
+                        error={errors.role?.message} 
+                        type="text" 
+                        placeholder="Contoh: Senior Developer" 
                     />
-                    <FormInput
-                        text="Foto"
-                        name="foto"
-                        register={register}
-                        error={errors.foto?.message as string}
-                        type="file"
+
+                    <FormInput 
+                        label="Image URL" 
+                        name="image" 
+                        register={register} 
+                        error={errors.image?.message} 
+                        type="text" 
+                        placeholder="https://..." 
                     />
-                    <div className="pt-2">
-                        <Button
-                            label="Simpan"
-                            variant="primary"
-                            type="submit"
-                            isLoading={isSubmitting}
-                            className="w-full"
+                    
+                    <div className="flex gap-3 pt-2">
+                        <button
+                            type="button"
+                            onClick={() => navigate("/dashboard/speakers")}
+                            className="flex-1 border border-gray-200 text-gray-500 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-all duration-150 cursor-pointer text-center"
+                        >
+                            Batal
+                        </button>
+                        <Button 
+                            label="Tambah Speaker" 
+                            type="submit" 
+                            isLoading={isSubmitting} 
+                            className="flex-2 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md shadow-blue-600/10 hover:scale-[1.01] cursor-pointer" 
                         />
                     </div>
                 </form>

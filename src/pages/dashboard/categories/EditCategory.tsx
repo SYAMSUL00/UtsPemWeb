@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,15 +12,22 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function CreateCategory() {
+export default function EditCategory() {
+    const { id } = useParams();
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+    const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
 
+    useEffect(() => {
+        fetch(`http://localhost:3000/categories/${id}`)
+            .then(res => res.json())
+            .then(data => setValue("name", data.name));
+    }, [id]);
+
     const onSubmit = async (data: FormData) => {
-        await fetch("http://localhost:3000/categories", {
-            method: "POST",
+        await fetch(`http://localhost:3000/categories/${id}`, {
+            method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         });
@@ -30,8 +38,8 @@ export default function CreateCategory() {
         <div className="flex justify-center items-center py-12 animate-fade-in">
             <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-100/40 p-8 w-full max-w-md transition-all duration-300 hover:shadow-2xl hover:shadow-gray-200/50">
                 <div className="mb-6">
-                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Create Category</h1>
-                    <p className="text-xs text-gray-400 mt-1">Tambahkan data kategori baru ke sistem.</p>
+                    <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">Edit Category</h1>
+                    <p className="text-xs text-gray-400 mt-1">Perbarui detail nama kategori ke sistem.</p>
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -41,7 +49,6 @@ export default function CreateCategory() {
                         register={register} 
                         error={errors.name?.message} 
                         type="text" 
-                        placeholder="Nama kategori" 
                     />
                     
                     <div className="flex gap-3 pt-2">
@@ -53,7 +60,8 @@ export default function CreateCategory() {
                             Batal
                         </button>
                         <Button 
-                            label="Tambah Kategori" 
+                            label="Simpan Perubahan" 
+                            variant="primary" 
                             type="submit" 
                             isLoading={isSubmitting} 
                             className="flex-2 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md shadow-blue-600/10 hover:scale-[1.01] cursor-pointer" 
