@@ -24,16 +24,13 @@ export default function DashboardLayout() {
         <div className="flex min-h-screen bg-gray-50">
             <div className="h-screen sticky top-0 bg-slate-900 w-64 flex flex-col justify-between p-4 border-r border-slate-800 shadow-xl">
                 <div>
-                    {/* Header Sidebar: Logo & Teks Sejajar Vertikal */}
                     <div className="py-5 px-2 mb-6 flex items-center gap-3 border-b border-slate-800">
-                        {/* Logo Kotak E M S */}
                         <div className="w-9 py-2 rounded-xl bg-blue-600 flex flex-col items-center justify-center font-black text-white text-xs leading-none shadow-md shadow-blue-500/20 gap-2">
                             <span>E</span>
                             <span>M</span>
                             <span>S</span>
                         </div>
 
-                        {/* Teks Kepanjangan Sejajar Per Huruf */}
                         <div className="flex flex-col text-[11px] font-bold uppercase tracking-wider text-slate-300 leading-none gap-2">
                             <span className="flex items-center"><span className="">E</span>vent</span>
                             <span className="flex items-center"><span className="">M</span>anagement</span>

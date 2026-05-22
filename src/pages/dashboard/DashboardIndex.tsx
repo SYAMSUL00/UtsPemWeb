@@ -1,141 +1,137 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { UserIcon, CalendarIcon, BriefcaseIcon, Trash2Icon, Edit3Icon } from "lucide-react";
 
-interface Speaker {
-    id: number;
-    name: string;
-    role: string;
-    image: string;
-    createdAt: string;
-}
-
-export default function SpeakerList() {
-    const [speakers, setSpeakers] = useState<Speaker[]>([]);
+export default function DashboardIndex() {
+    const [totalCategory, setTotalCategory] = useState(0);
+    const [totalSpeaker, setTotalSpeaker] = useState(0);
+    const [totalEvent, setTotalEvent] = useState(0);
     const [loading, setLoading] = useState(true);
 
     const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-    const fetchSpeakers = async () => {
-        try {
-            const res = await fetch(`${API_BASE_URL}/speakers`);
-            if (!res.ok) throw new Error("Gagal mengambil data pembicara");
-            const data = await res.json();
-            setSpeakers(data);
-        } catch (err) {
-            console.error("Gagal fetch speakers:", err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        if (!confirm("Yakin hapus speaker ini?")) return;
-        try {
-            const res = await fetch(`${API_BASE_URL}/speakers/${id}`, { method: "DELETE" });
-            if (!res.ok) throw new Error("Gagal menghapus data speaker");
-            fetchSpeakers();
-        } catch (err) {
-            console.error("Error deleting speaker:", err);
-            alert("Terjadi kesalahan saat menghapus data speaker.");
-        }
-    };
-
     useEffect(() => {
-        fetchSpeakers();
-    }, []);
+        const token = localStorage.getItem("token");
+        const headers: HeadersInit = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        };
+
+        Promise.all([
+            fetch(`${API_BASE_URL}/categories`, { headers }).then(r => {
+                if (!r.ok) throw new Error("Gagal memuat kategori");
+                return r.json();
+            }),
+            fetch(`${API_BASE_URL}/speakers`, { headers }).then(r => {
+                if (!r.ok) throw new Error("Gagal memuat speaker");
+                return r.json();
+            }),
+            fetch(`${API_BASE_URL}/events`, { headers }).then(r => {
+                if (!r.ok) throw new Error("Gagal memuat event");
+                return r.json();
+            }),
+        ])
+        .then(([categories, speakers, events]) => {
+            console.log("categories:", categories);
+            console.log("speakers:", speakers);
+            console.log("events:", events);
+
+            setTotalCategory(Array.isArray(categories) ? categories.length : categories.data?.length ?? 0);
+            setTotalSpeaker(Array.isArray(speakers) ? speakers.length : speakers.data?.length ?? 0);
+            setTotalEvent(Array.isArray(events) ? events.length : events.data?.length ?? 0);
+        })
+        .catch(err => console.error("Fetch dashboard error:", err))
+        .finally(() => setLoading(false));
+    }, [API_BASE_URL]);
+
+    const cards = [
+        { 
+            label: "Total Category", 
+            value: totalCategory,
+            bgSolid: "group-hover:bg-purple-600",
+            bgLight: "bg-purple-50",
+            textColor: "text-purple-600",
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            )
+        },
+        { 
+            label: "Total Speaker", 
+            value: totalSpeaker,
+            bgSolid: "group-hover:bg-rose-600",
+            bgLight: "bg-rose-50",
+            textColor: "text-rose-600",
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+            )
+        },
+        { 
+            label: "Total Event", 
+            value: totalEvent,
+            bgSolid: "group-hover:bg-amber-600",
+            bgLight: "bg-amber-50",
+            textColor: "text-amber-600",
+            icon: (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            )
+        },
+    ];
 
     return (
-        <div className="max-w-7xl mx-auto p-2 animate-fade-in">
-            <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-5">
+        <div className="max-w-7xl mx-auto p-2">
+            <div className="mb-8 flex items-center justify-between border-b border-gray-100 pb-5">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Semua Speaker</h1>
-                    <p className="text-sm text-gray-500 mt-1">Kelola data pembicara dan pemateri untuk event Anda.</p>
+                    <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
+                    <p className="text-sm text-gray-500 mt-1">Selamat datang kembali di <span className="font-semibold text-purple-600">Event Management System</span></p>
                 </div>
-                <Link
-                    to="/dashboard/speakers/create"
-                    className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all duration-200 shadow-md shadow-blue-600/10 hover:scale-[1.02]"
-                >
-                    + Tambah Speaker
-                </Link>
+                <div className="text-xs bg-purple-50 text-purple-700 font-medium px-3 py-1.5 rounded-full border border-purple-100">
+                    Live Monitoring
+                </div>
             </div>
 
-            {loading ? (
-                <div className="flex items-center justify-center py-24 text-gray-400 text-sm">
-                    <div className="flex items-center justify-center gap-2 bg-white px-6 py-3 rounded-2xl border border-gray-100 shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                        Memuat data pembicara...
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {cards.map((card) => (
+                    <div 
+                        key={card.label} 
+                        className="bg-white rounded-2xl border border-gray-100 p-6 flex items-center justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group"
+                    >
+                        <div className="space-y-2">
+                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{card.label}</p>
+                            {loading ? (
+                                <div className="h-9 w-16 bg-gray-200 rounded animate-pulse" />
+                            ) : (
+                                <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                                    {card.value}
+                                </h2>
+                            )}
+                        </div>
+                        
+                        <div className={`p-4 rounded-xl ${card.bgLight} ${card.textColor} transition-all duration-300 ${card.bgSolid} group-hover:text-white group-hover:scale-110 shadow-sm`}>
+                            {card.icon}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="bg-slate-900 rounded-2xl p-6 text-white shadow-md">
+                <div className="relative flex items-start gap-4">
+                    <div className="p-2 bg-slate-800 rounded-lg text-purple-400 mt-0.5">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 className="text-base font-semibold tracking-wide">Pemberitahuan Sistem</h2>
+                        <p className="text-gray-400 text-sm mt-1 leading-relaxed">
+                            Gunakan panel navigasi menu di sebelah kiri (sidebar) untuk mulai melakukan manipulasi, penambahan, maupun penghapusan data master kategori, pembicara (speaker), dan jadwal event.
+                        </p>
                     </div>
                 </div>
-            ) : speakers.length === 0 ? (
-                <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 shadow-sm text-gray-400 text-sm">
-                    <UserIcon size={40} className="mx-auto mb-3 text-gray-300" />
-                    Belum ada data speaker tersedia.
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {speakers.map((speaker) => (
-                        <div 
-                            key={speaker.id} 
-                            className="group bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-gray-100/70 hover:-translate-y-1"
-                        >
-                            <div className="p-5 flex flex-col items-center text-center">
-                                <div className="relative mb-4 mt-2">
-                                    {speaker.image ? (
-                                        <img
-                                            src={speaker.image}
-                                            alt={speaker.name}
-                                            className="w-24 h-24 rounded-full object-cover border-4 border-gray-50 group-hover:border-blue-50 transition-all duration-300 shadow-md"
-                                        />
-                                    ) : (
-                                        <div className="w-24 h-24 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-2xl border-4 border-blue-50/30 shadow-inner">
-                                            {speaker.name.charAt(0).toUpperCase()}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <h3 className="text-base font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-150 line-clamp-1">
-                                    {speaker.name}
-                                </h3>
-                                
-                                <p className="text-xs text-gray-400 font-medium mt-1 flex items-center gap-1">
-                                    <BriefcaseIcon size={12} className="text-gray-300" />
-                                    {speaker.role}
-                                </p>
-                            </div>
-
-                            <div className="px-5 pb-5 pt-3 bg-gray-50/50 border-t border-gray-50/80 flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-1 text-[11px] font-medium text-gray-400">
-                                    <CalendarIcon size={12} />
-                                    <span>
-                                        {new Date(speaker.createdAt).toLocaleDateString("id-ID", {
-                                            day: "numeric",
-                                            month: "short",
-                                        })}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-1.5">
-                                    <Link
-                                        to={`/dashboard/speakers/edit/${speaker.id}`}
-                                        className="bg-white text-blue-600 border border-gray-200/80 p-2 rounded-xl text-xs font-semibold hover:border-blue-200 hover:bg-blue-50/40 transition-all duration-150 flex items-center justify-center shadow-sm"
-                                        title="Edit Speaker"
-                                    >
-                                        <Edit3Icon size={14} />
-                                    </Link>
-                                    <button
-                                        onClick={() => handleDelete(speaker.id)}
-                                        className="bg-white text-red-500 border border-gray-200/80 p-2 rounded-xl text-xs font-semibold hover:border-red-200 hover:bg-red-50/50 transition-all duration-150 flex items-center justify-center shadow-sm cursor-pointer"
-                                        title="Hapus Speaker"
-                                    >
-                                        <Trash2Icon size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+            </div>
         </div>
     );
 }
