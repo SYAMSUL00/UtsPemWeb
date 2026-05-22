@@ -28,19 +28,33 @@ export default function CreateEvent() {
         resolver: zodResolver(schema),
     });
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     useEffect(() => {
-        fetch("http://localhost:3000/categories")
-            .then(res => res.json())
-            .then(data => setCategories(data));
-    }, []);
+        fetch(`${API_BASE_URL}/categories`)
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal mengambil kategori");
+                return res.json();
+            })
+            .then(data => setCategories(data))
+            .catch(error => console.error("Error fetching categories:", error));
+    }, [API_BASE_URL]);
 
     const onSubmit = async (data: FormData) => {
-        await fetch("http://localhost:3000/events", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/events");
+        try {
+            const res = await fetch(`${API_BASE_URL}/events`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal menambahkan event");
+            
+            navigate("/dashboard/events");
+        } catch (error) {
+            console.error("Error creating event:", error);
+            alert("Terjadi kesalahan saat menambahkan event.");
+        }
     };
 
     return (

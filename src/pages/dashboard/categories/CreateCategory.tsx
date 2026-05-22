@@ -17,13 +17,23 @@ export default function CreateCategory() {
         resolver: zodResolver(schema),
     });
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     const onSubmit = async (data: FormData) => {
-        await fetch("http://localhost:3000/categories", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/category");
+        try {
+            const res = await fetch(`${API_BASE_URL}/categories`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal menambahkan kategori");
+            
+            navigate("/dashboard/category");
+        } catch (error) {
+            console.error("Error creating category:", error);
+            alert("Terjadi kesalahan saat menambahkan kategori.");
+        }
     };
 
     return (

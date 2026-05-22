@@ -21,14 +21,22 @@ export default function EventList() {
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     const fetchData = async () => {
         try {
             const [eventsRes, categoriesRes] = await Promise.all([
-                fetch("http://localhost:3000/events"),
-                fetch("http://localhost:3000/categories"),
+                fetch(`${API_BASE_URL}/events`),
+                fetch(`${API_BASE_URL}/categories`),
             ]);
+
+            if (!eventsRes.ok || !categoriesRes.ok) {
+                throw new Error("Gagal mengambil data dari server");
+            }
+
             const eventsData = await eventsRes.json();
             const categoriesData = await categoriesRes.json();
+            
             setEvents(eventsData);
             setCategories(categoriesData);
         } catch (err) {
@@ -45,8 +53,14 @@ export default function EventList() {
 
     const handleDelete = async (id: number) => {
         if (!confirm("Yakin hapus event ini?")) return;
-        await fetch(`http://localhost:3000/events/${id}`, { method: "DELETE" });
-        fetchData();
+        try {
+            const res = await fetch(`${API_BASE_URL}/events/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Gagal menghapus event");
+            fetchData();
+        } catch (err) {
+            console.error("Error deleting event:", err);
+            alert("Terjadi kesalahan saat menghapus event.");
+        }
     };
 
     useEffect(() => {

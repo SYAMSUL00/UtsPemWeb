@@ -19,13 +19,23 @@ export default function CreateSpeaker() {
         resolver: zodResolver(schema),
     });
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     const onSubmit = async (data: FormData) => {
-        await fetch("http://localhost:3000/speakers", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/speakers");
+        try {
+            const res = await fetch(`${API_BASE_URL}/speakers`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal menambahkan speaker");
+            
+            navigate("/dashboard/speakers");
+        } catch (error) {
+            console.error("Error creating speaker:", error);
+            alert("Terjadi kesalahan saat menambahkan data speaker.");
+        }
     };
 
     return (

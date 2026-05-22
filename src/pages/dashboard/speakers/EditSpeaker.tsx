@@ -21,23 +21,37 @@ export default function EditSpeaker() {
         resolver: zodResolver(schema),
     });
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     useEffect(() => {
-        fetch(`http://localhost:3000/speakers/${id}`)
-            .then(res => res.json())
+        fetch(`${API_BASE_URL}/speakers/${id}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal mengambil data pembicara");
+                return res.json();
+            })
             .then(data => {
                 setValue("name", data.name);
                 setValue("role", data.role);
                 setValue("image", data.image);
-            });
-    }, [id]);
+            })
+            .catch(error => console.error("Error fetching speaker details:", error));
+    }, [id, setValue, API_BASE_URL]);
 
     const onSubmit = async (data: FormData) => {
-        await fetch(`http://localhost:3000/speakers/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/speakers");
+        try {
+            const res = await fetch(`${API_BASE_URL}/speakers/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal memperbarui data pembicara");
+            
+            navigate("/dashboard/speakers");
+        } catch (error) {
+            console.error("Error updating speaker:", error);
+            alert("Terjadi kesalahan saat menyimpan perubahan data pembicara.");
+        }
     };
 
     return (

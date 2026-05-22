@@ -70,7 +70,6 @@ export default function Login() {
                     </Link>
                 </p>
 
-                {/* Informasi Akun Dummy di Paling Bawah */}
                 <div className="mt-6 pt-4 border-t border-dashed border-gray-100 bg-gray-50/50 rounded-2xl p-3.5 text-center">
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Akun Demo</p>
                     <div className="flex justify-center gap-4 text-xs font-medium text-gray-600">

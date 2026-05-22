@@ -8,17 +8,28 @@ interface Category {
 
 export default function CategoryList() {
     const [categories, setCategories] = useState<Category[]>([]);
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     const fetchCategories = async () => {
-        const res = await fetch("http://localhost:3000/categories");
-        const data = await res.json();
-        setCategories(data);
+        try {
+            const res = await fetch(`${API_BASE_URL}/categories`);
+            if (!res.ok) throw new Error("Gagal mengambil data");
+            const data = await res.json();
+            setCategories(data);
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
     };
 
     const handleDelete = async (id: number) => {
         if (!confirm("Yakin hapus category ini?")) return;
-        await fetch(`http://localhost:3000/categories/${id}`, { method: "DELETE" });
-        fetchCategories();
+        try {
+            const res = await fetch(`${API_BASE_URL}/categories/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Gagal menghapus data");
+            fetchCategories();
+        } catch (error) {
+            console.error("Error deleting category:", error);
+        }
     };
 
     useEffect(() => {

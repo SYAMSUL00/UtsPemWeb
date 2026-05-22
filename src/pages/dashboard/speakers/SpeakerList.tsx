@@ -14,9 +14,12 @@ export default function SpeakerList() {
     const [speakers, setSpeakers] = useState<Speaker[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
     const fetchSpeakers = async () => {
         try {
-            const res = await fetch("http://localhost:3000/speakers");
+            const res = await fetch(`${API_BASE_URL}/speakers`);
+            if (!res.ok) throw new Error("Gagal mengambil data pembicara");
             const data = await res.json();
             setSpeakers(data);
         } catch (err) {
@@ -28,8 +31,14 @@ export default function SpeakerList() {
 
     const handleDelete = async (id: number) => {
         if (!confirm("Yakin hapus speaker ini?")) return;
-        await fetch(`http://localhost:3000/speakers/${id}`, { method: "DELETE" });
-        fetchSpeakers();
+        try {
+            const res = await fetch(`${API_BASE_URL}/speakers/${id}`, { method: "DELETE" });
+            if (!res.ok) throw new Error("Gagal menghapus data speaker");
+            fetchSpeakers();
+        } catch (err) {
+            console.error("Error deleting speaker:", err);
+            alert("Terjadi kesalahan saat menghapus data speaker.");
+        }
     };
 
     useEffect(() => {

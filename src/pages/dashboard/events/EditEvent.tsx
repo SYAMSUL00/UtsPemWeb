@@ -29,29 +29,47 @@ export default function EditEvent() {
         resolver: zodResolver(schema),
     });
 
-    useEffect(() => {
-        fetch("http://localhost:3000/categories")
-            .then(res => res.json())
-            .then(data => setCategories(data));
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-        fetch(`http://localhost:3000/events/${id}`)
-            .then(res => res.json())
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/categories`)
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal mengambil daftar kategori");
+                return res.json();
+            })
+            .then(data => setCategories(data))
+            .catch(error => console.error("Error fetching categories:", error));
+
+        fetch(`${API_BASE_URL}/events/${id}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal mengambil detail event");
+                return res.json();
+            })
             .then(data => {
                 setValue("name", data.name);
                 setValue("categoryId", String(data.categoryId));
                 setValue("location", data.location);
                 setValue("dateEvent", data.dateEvent.split("T")[0]);
                 setValue("description", data.description);
-            });
-    }, [id]);
+            })
+            .catch(error => console.error("Error fetching event details:", error));
+    }, [id, setValue, API_BASE_URL]);
 
     const onSubmit = async (data: FormData) => {
-        await fetch(`http://localhost:3000/events/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/events");
+        try {
+            const res = await fetch(`${API_BASE_URL}/events/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal memperbarui data event");
+            
+            navigate("/dashboard/events");
+        } catch (error) {
+            console.error("Error updating event:", error);
+            alert("Terjadi kesalahan saat menyimpan perubahan event.");
+        }
     };
 
     return (
@@ -91,6 +109,7 @@ export default function EditEvent() {
                         register={register} 
                         error={errors.location?.message} 
                         type="text" 
+                        placeholder="Lokasi event" 
                     />
                     
                     <FormInput 
@@ -107,6 +126,7 @@ export default function EditEvent() {
                         register={register} 
                         error={errors.description?.message} 
                         type="text" 
+                        placeholder="Deskripsi event" 
                     />
 
                     <div className="flex gap-3 pt-4 border-t border-gray-50 mt-2">

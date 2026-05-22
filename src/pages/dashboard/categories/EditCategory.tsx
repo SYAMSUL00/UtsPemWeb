@@ -18,20 +18,34 @@ export default function EditCategory() {
     const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
+    
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
     useEffect(() => {
-        fetch(`http://localhost:3000/categories/${id}`)
-            .then(res => res.json())
-            .then(data => setValue("name", data.name));
-    }, [id]);
+        fetch(`${API_BASE_URL}/categories/${id}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Gagal mengambil detail kategori");
+                return res.json();
+            })
+            .then(data => setValue("name", data.name))
+            .catch(error => console.error("Error fetching category details:", error));
+    }, [id, setValue, API_BASE_URL]);
 
     const onSubmit = async (data: FormData) => {
-        await fetch(`http://localhost:3000/categories/${id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        });
-        navigate("/dashboard/category");
+        try {
+            const res = await fetch(`${API_BASE_URL}/categories/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            
+            if (!res.ok) throw new Error("Gagal memperbarui kategori");
+            
+            navigate("/dashboard/category");
+        } catch (error) {
+            console.error("Error updating category:", error);
+            alert("Terjadi kesalahan saat menyimpan perubahan.");
+        }
     };
 
     return (
